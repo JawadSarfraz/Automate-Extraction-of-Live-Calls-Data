@@ -1,0 +1,5 @@
+# Python deps for the ML/audio pipeline (Python 3.9+).
+# CPU works; on a CUDA GPU box faster-whisper auto-uses it (see README: set device="cuda").
+numpy>=1.24
+scipy>=1.10
+faster-whisper>=1.2.0

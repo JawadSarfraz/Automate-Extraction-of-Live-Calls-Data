@@ -1,0 +1,15 @@
+{
+  "name": "xdial-calls-extractor",
+  "version": "1.0.0",
+  "description": "Extract live calls data from xDial dashboard",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "explore": "node src/explore.mjs",
+    "extract": "node src/extract.mjs",
+    "download": "node src/download.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.60.0"
+  }
+}
