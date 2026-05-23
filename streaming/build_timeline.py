@@ -139,9 +139,9 @@ def main():
   <td><span class="oc" style="background:{OUTCOME_COLOR.get(oc,'#777')}">{oc}</span></td>
   <td class="num">{res.call_len:.0f}s</td>
   <td class="num">{lead}</td>
-  <td class="strip">{strip_html(res)}</td>
+  <td class="aud"><audio controls preload="none" src="{esc(audio_src(wav))}"></audio></td>
   <td class="cust">{esc(cust_at_fire)}</td>
-  <td><audio controls preload="none" src="{esc(audio_src(wav))}"></audio></td>
+  <td class="strip"><div class="sw">{strip_html(res)}</div></td>
 </tr>"""
 
     body = "\n".join(row_html(i + 1, *r) for i, r in enumerate(rows))
@@ -165,15 +165,16 @@ def main():
  .pill{{color:#fff;padding:2px 8px;border-radius:10px;font-size:11px}}
  .oc{{color:#fff;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700}}
  .num{{text-align:right;font-variant-numeric:tabular-nums;color:#475569}}
- .strip{{white-space:nowrap;line-height:0}} .cell{{display:inline-block;width:13px;height:15px;text-align:center;font-size:9px;color:#fff;line-height:15px}}
- .cust{{max-width:260px;font-size:11px;color:#0f172a}}
- audio{{height:30px}}
+ .aud{{width:240px}} audio{{height:32px;width:230px}}
+ .sw{{max-width:780px;overflow-x:auto;white-space:nowrap;line-height:0;padding-bottom:4px}}
+ .cell{{display:inline-block;width:12px;height:15px;text-align:center;font-size:9px;color:#fff;line-height:15px}}
+ .cust{{max-width:240px;font-size:11px;color:#0f172a}}
 </style></head><body>
 <header><b>⏱ Streaming detection timeline — {date}</b> &nbsp; {len(rows)} calls &nbsp;|&nbsp;
  v2 brain, step={args.step}s, tau={args.tau}, k={args.k} &nbsp;|&nbsp; each square = 1s, colored by what v2 said; ★ = moment flagged
  <div class="leg">colors: {legend}</div></header>
 <div class="bar"><button onclick="filt('all')" style="border-color:#333"><b>all ({len(rows)})</b></button> {chips}</div>
-<table id="t"><thead><tr><th>#</th><th>phone/time</th><th>true</th><th>flagged</th><th>outcome</th><th>len</th><th>saved</th><th>per-second timeline (hover a square)</th><th>customer words @ flag</th><th>listen</th></tr></thead>
+<table id="t"><thead><tr><th>#</th><th>phone/time</th><th>true</th><th>flagged</th><th>outcome</th><th>len</th><th>saved</th><th>🔊 listen</th><th>customer words @ flag</th><th>per-second timeline (hover a square) →</th></tr></thead>
 <tbody>{body}</tbody></table>
 <script>
  function filt(o){{for(const tr of document.querySelectorAll('#t tbody tr'))tr.style.display=(o==='all'||tr.dataset.oc===o)?'':'none';}}
