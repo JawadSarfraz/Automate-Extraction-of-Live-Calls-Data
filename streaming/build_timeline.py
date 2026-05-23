@@ -165,7 +165,7 @@ def main():
  .pill{{color:#fff;padding:2px 8px;border-radius:10px;font-size:11px}}
  .oc{{color:#fff;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700}}
  .num{{text-align:right;font-variant-numeric:tabular-nums;color:#475569}}
- .aud{{width:240px}} audio{{height:32px;width:230px}}
+ .aud{{width:420px}} audio{{height:42px;width:410px}}
  .sw{{max-width:780px;overflow-x:auto;white-space:nowrap;line-height:0;padding-bottom:4px}}
  .cell{{display:inline-block;width:12px;height:15px;text-align:center;font-size:9px;color:#fff;line-height:15px}}
  .cust{{max-width:240px;font-size:11px;color:#0f172a}}
