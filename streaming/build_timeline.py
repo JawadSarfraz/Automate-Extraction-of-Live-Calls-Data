@@ -65,11 +65,24 @@ def main():
     ap.add_argument("--tau", type=float, default=0.6)
     ap.add_argument("--k", type=int, default=2)
     ap.add_argument("--all", action="store_true", help="include every call (default: only informative ones)")
+    ap.add_argument("--audio", choices=["local", "remote"], default="local",
+                    help="local = play files next to the HTML (needs the server); "
+                         "remote = bake in public URLs -> a single standalone file you just open")
     args = ap.parse_args()
     date = args.date
 
     tdir = os.path.join(_paths.DATA, "transcripts", date)
     v1 = {r["file"]: r for r in json.load(open(os.path.join(_paths.DATA, "analysis", f"classified_{date}.json")))}
+
+    # filename -> public URL (for the standalone, shareable file)
+    url_map = {}
+    if args.audio == "remote":
+        recs = json.load(open(os.path.join(_paths.DATA, f"recordings_{date}.json")))["recordings"]
+        for r in recs:
+            url_map[os.path.basename(r["file_url"].split("?")[0])] = r["file_url"]
+
+    def audio_src(fn):
+        return url_map.get(fn, fn) if args.audio == "remote" else fn
     bank, _, _ = learn_bot_bank(tdir)
     detector = StreamingDetector(V2RulesClassifier(),
                                  lambda: ConfidenceTrigger(tau=args.tau, k=args.k))
@@ -128,7 +141,7 @@ def main():
   <td class="num">{lead}</td>
   <td class="strip">{strip_html(res)}</td>
   <td class="cust">{esc(cust_at_fire)}</td>
-  <td><audio controls preload="none" src="{esc(wav)}"></audio></td>
+  <td><audio controls preload="none" src="{esc(audio_src(wav))}"></audio></td>
 </tr>"""
 
     body = "\n".join(row_html(i + 1, *r) for i, r in enumerate(rows))
@@ -166,9 +179,11 @@ def main():
  function filt(o){{for(const tr of document.querySelectorAll('#t tbody tr'))tr.style.display=(o==='all'||tr.dataset.oc===o)?'':'none';}}
 </script></body></html>"""
 
-    out_path = os.path.join(_paths.DATA, "audio", date, f"timeline_{date}.html")
+    name = f"timeline_{date}_shareable.html" if args.audio == "remote" else f"timeline_{date}.html"
+    out_path = os.path.join(_paths.DATA, "audio", date, name)
     open(out_path, "w").write(out)
-    print(f"wrote {os.path.relpath(out_path, _paths.ROOT)} ({len(rows)} rows)")
+    note = " (standalone — audio streams from public URLs; just download + open)" if args.audio == "remote" else ""
+    print(f"wrote {os.path.relpath(out_path, _paths.ROOT)} ({len(rows)} rows){note}")
     print("outcome counts:", dict(oc_counts))
 
 
