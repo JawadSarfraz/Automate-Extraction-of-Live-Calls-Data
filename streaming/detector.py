@@ -15,6 +15,7 @@ class StepRecord:
     t: float
     label: str
     conf: float
+    customer_text: str = ""   # the bot-stripped text revealed by time t (for inspection)
 
 
 @dataclass
@@ -51,7 +52,7 @@ class StreamingDetector:
         fired_label = None
         for obs in source.observations():
             label, conf, _extra = self.classifier.classify(obs)
-            traj.append(StepRecord(obs.t, label, conf))
+            traj.append(StepRecord(obs.t, label, conf, obs.customer_text))
             last_t = obs.t
             if not fired and trigger.update(obs.t, label, conf):
                 fired = True
