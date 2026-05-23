@@ -1,0 +1,12 @@
+# Extra deps for the supervised v3 classifier (customer-text embeddings + sklearn).
+# These are HEAVY (torch) and OPTIONAL — only needed to train/run v3, not the
+# extraction/ASR/v1/v2 pipeline. Install on top of requirements.txt:
+#
+#   # CPU-only torch keeps disk small; embedding 2k short texts is seconds on CPU.
+#   .venv/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu
+#   .venv/bin/pip install -r requirements-v3.txt
+#
+# (On a roomy GPU box you may instead want the default CUDA torch wheel.)
+sentence-transformers>=2.2
+scikit-learn>=1.3
+joblib>=1.3
