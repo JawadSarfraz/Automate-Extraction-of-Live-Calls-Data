@@ -4,6 +4,43 @@
 > learned, and what to do next. Claude Code loads this automatically.
 > **Last updated:** 2026-05-25 (added v3 classifier, streaming detector, UDP packet transport).
 
+## 0. Methodology & journey (where we started → where we are)
+
+**Guiding principles (the methodology):**
+- **Isolate the customer.** The bot's script is identical on every call and dominates
+  the audio; subtract it (a learned "bot phrase bank") to get the customer's words —
+  this single trick is what makes everything else work.
+- **Transparent-first.** Start with explainable rules (v1 acoustic, v2 content) before
+  ML, so every decision traces to a phrase list or threshold and the team can audit it.
+- **Weak supervision as a bootstrap.** Use the platform's `category` as free, noisy
+  labels — never as ground truth (its taxonomy differs from ours).
+- **Measure before acting.** Build the detector in **flag-only** mode with a stopwatch;
+  prove *how early* and *how safely* it could decide before it is ever allowed to cut a call.
+- **Blind detector, sealed labels.** The detector sees only audio; labels only grade it
+  afterwards — no leakage (enforced + tested).
+- **De-risk cheaply.** Validate on data we already have before spending weeks on labeling
+  or telephony integration.
+- **Fail-safe = keep talking.** Any uncertainty defaults to NOT hanging up.
+- **Decouple transport from detection.** Same "brain" whether audio comes from a file,
+  a recording, or live network packets.
+
+**The journey so far:**
+1. **Start:** raw call recordings + weak platform labels, no ground truth; goal = a
+   real-time keep-talking/hang-up decision for the bot.
+2. **v1 (acoustic-only):** DSP/VAD features → over-predicts "fair" because the mono
+   recording contains our own bot. *Lesson: must isolate the customer.*
+3. **Key insight:** the bot script is constant → strip it → **customer residue**.
+4. **v2 (rules on the residue):** transparent content detectors → Simple/Smart/Fair/no_contact.
+5. **v3 (supervised):** MiniLM customer-text embeddings ⊕ acoustic ⊕ cue counts, HGB,
+   weak-labeled → OOF macro-F1 0.819 (a bootstrap; real gain gated on human labels).
+6. **Streaming:** replay calls second-by-second + a stopwatch → VMs/bots detectable at
+   **~4–5s**, but a **15% Fair false-flag** rate surfaces as the safety blocker.
+7. **Packet transport:** proved the *same* detector works on a live **UDP audio stream**
+   (production-shaped: packets → buffer → detect).
+8. **Where we are now:** the detector **detects & flags only — it does NOT cut calls yet.**
+   Next: cut the false-flag rate (Phase 2), tighten real-time cadence, then add the
+   cut/action layer and the live telephony hookup. (Full roadmap in §7.)
+
 ## 1. Goal
 
 Outbound dialer (campaign 270, "Final Expense") runs an **AI voice bot**
